@@ -6,8 +6,9 @@ window = Tk()
 window.title('Library App')
 
 # setting window size
-window.geometry('1000x500')
+window.geometry('500x300')
 
+############################# Functionalities Functions ##################################
 def get_selected_row(event):
     '''
     This function help use track the 
@@ -18,7 +19,7 @@ def get_selected_row(event):
     index=list1.curselection()[0]
     selected_tuple=list1.get(index)
 
-
+# Populate Listbox with books
 def view_command():
     '''
     This function helps use populate the listbox 
@@ -28,10 +29,40 @@ def view_command():
     for row in db.view_all():
         list1.insert(END,row)
 
-def get_details():
-    print(selected_tuple)
+# Add Book
+def add_book(topic, author):
+    '''
+    Takes the topic and author from the filled entries in the
+    add_book_dialog and add it to the database 
+    '''
+    db.insert(topic, author)
+    add_dialog.destroy()
+    view_command()
 
+# Update Book
+def update_book(id, topic, author):
+    '''
+    Takes the id, topic and author from the filled entries in the
+    update_book_dialog and update the selected book to the database 
+    '''
+    db.update(id, topic, author)
+    update_dialog.destroy()
+    view_command()
 
+# Delete seleted book from database
+def delete_book(id):
+    '''
+    Takes the id and delete selected book from the database 
+    '''
+    id = str(id)
+    db.delete(id)
+    delete_dialog.destroy()
+    view_command()
+
+############################# End Functionalities Functions ##################################
+
+############################# Dialog Function ##################################
+# Add Book Dialog
 def add_book_dialog():
     '''
     This function create a new window where we can 
@@ -60,7 +91,7 @@ def add_book_dialog():
     add_btn = Button(add_dialog, text = "Add a book", bg = "red", fg = "black", font = ("Arial",20), command=lambda:add_book(topic_txt.get(), author_txt.get()))
     add_btn.grid(column = 1, row = 2)
 
-
+# Update Book Dialog
 def update_book_dialog(id, topic, author):
     '''
     This function create a new window where we can 
@@ -98,25 +129,22 @@ def update_book_dialog(id, topic, author):
     font = ("Arial",20), command=lambda:update_book(id, topic_txt.get(), author_txt.get()))
     add_btn.grid(column = 1, row = 2)
 
-def add_book(topic, author):
-    '''
-    Takes the topic and author from the filled entries in the
-    add_book_dialog and add it to the database 
-    '''
-    db.insert(topic, author)
-    add_dialog.destroy()
-    view_command()
+# Delete Book Dialog
+def delete_book_dialog(id):
+    global delete_dialog
+    delete_dialog = Toplevel(window)
 
-def update_book(id, topic, author):
-    '''
-    Takes the topic and author from the filled entries in the
-    add_book_dialog and add it to the database 
-    '''
-    db.update(id, topic, author)
-    update_dialog.destroy()
-    view_command()
+    yes_btn = Button(delete_dialog, text = "Yes", font = ("Arial",10), 
+    command=lambda:delete_book(id))
+    yes_btn.grid(column = 1, row = 1)
+
+    no_btn = Button(delete_dialog, text = "No", font = ("Arial",10), 
+    command=lambda:delete_dialog.destroy())
+    no_btn.grid(column = 2, row = 1)
+############################# End Dialog Function ##################################
 
 
+############################# UI of the main window ##################################
 # Button that calls the add book dialog to add a book to the DB
 add_btn = Button(window, text = "Add a book", bg = "red", fg = "black", 
 font = ("Arial",20), command=add_book_dialog)
@@ -128,9 +156,14 @@ font = ("Arial",20), command=view_command)
 view_btn.grid(row=3,column=3)
 
 # Button that calls the update book diaglog
-selected_btn = Button(window, text = "Update book", bg = "red", fg = "black", 
+update_btn = Button(window, text = "Update book", bg = "red", fg = "black", 
 font = ("Arial",20), command=lambda:update_book_dialog(selected_tuple[0], selected_tuple[1], selected_tuple[2]))
-selected_btn.grid(row=4,column=3)
+update_btn.grid(row=4,column=3)
+
+# Button that calls the delete book diaglog
+delete_btn = Button(window, text = "Delete book", bg = "red", fg = "black", 
+font = ("Arial",20), command=lambda:delete_book_dialog(selected_tuple[0]))
+delete_btn.grid(row=5,column=3)
 
 # Listbox that holds the data of all the books
 list1=Listbox(window, height=6,width=35)
@@ -147,6 +180,8 @@ list1.bind('<<ListboxSelect>>',get_selected_row)
 # Configure the listbox and the scrollbar to work together
 list1.configure(yscrollcommand=sb1.set)
 sb1.configure(command=list1.yview)
+
+############################# End UI of the main window ##################################
 
 # This allows us to populate the listbox on initial load
 view_command()
