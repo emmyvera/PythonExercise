@@ -54,7 +54,7 @@ def delete_book(id):
     '''
     Takes the id and delete selected book from the database 
     '''
-    id = str(id)
+    id = str(id)    
     db.delete(id)
     delete_dialog.destroy()
     view_command()

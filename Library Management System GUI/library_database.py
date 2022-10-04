@@ -45,7 +45,7 @@ def update(id, topic, author):
 def delete(id):
     conn = sql3.connect('library.db') # Create the db 
     cursor = conn.cursor() # Create a cursor
-    cursor.execute('DELETE FROM books WHERE id=?', (id))
+    cursor.execute('DELETE FROM books WHERE id=?', (id,))
     conn.commit()
     conn.close()
 
